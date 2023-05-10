@@ -6,6 +6,7 @@ import jakarta.validation.Path;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -15,7 +16,6 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import java.util.Iterator;
 import java.util.List;
 
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.ResponseEntity.badRequest;
 import static org.springframework.http.ResponseEntity.internalServerError;
 
@@ -30,6 +30,17 @@ public class ErrorHandlingAdvice extends ResponseEntityExceptionHandler {
         WebRequest request
     ) {
         ValidationErrorResponse responseBody = convertToValidationErrorResponse(exception);
+        return badRequest().body(responseBody);
+    }
+
+    @Override
+    protected ResponseEntity<Object> handleHttpMessageNotReadable(
+        HttpMessageNotReadableException exception,
+        HttpHeaders headers,
+        HttpStatusCode status,
+        WebRequest request
+    ) {
+        ValidationErrorResponse responseBody = new ValidationErrorResponse("Cannot read request");
         return badRequest().body(responseBody);
     }
 
@@ -48,14 +59,14 @@ public class ErrorHandlingAdvice extends ResponseEntityExceptionHandler {
         List<FieldError> fieldErrors = exception.getBindingResult().getFieldErrors().stream()
             .map(this::toFieldError)
             .toList();
-        return new ValidationErrorResponse(BAD_REQUEST, "Validation failed", fieldErrors);
+        return new ValidationErrorResponse("Validation failed", fieldErrors);
     }
 
     private ValidationErrorResponse convertToValidationErrorResponse(ConstraintViolationException exception) {
         List<FieldError> fieldErrors = exception.getConstraintViolations().stream()
             .map(this::toFieldError)
             .toList();
-        return new ValidationErrorResponse(BAD_REQUEST, "Validation failed", fieldErrors);
+        return new ValidationErrorResponse("Validation failed", fieldErrors);
     }
 
     private FieldError toFieldError(org.springframework.validation.FieldError fieldError) {

@@ -7,9 +7,12 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 
+import static com.maracuya.app.common.ErrorResponseSpecifications.expectDetailedValidationError;
+import static com.maracuya.app.common.ErrorResponseSpecifications.expectSimpleValidationError;
 import static com.maracuya.app.common.Resources.loadResourceAsString;
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
+import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.equalTo;
 
 class AtmOrderingControllerTest extends BaseControllerTest {
@@ -79,34 +82,38 @@ class AtmOrderingControllerTest extends BaseControllerTest {
 
     @Test
     void shouldReturnBadRequestForInvalidPayload() {
-        shouldReturnBadRequest(1, "NON-TRIVIAL", 2);
-        shouldReturnBadRequest(-1, "STANDARD", 2);
-        shouldReturnBadRequest(10000, "STANDARD", 2);
-        shouldReturnBadRequest(1, "STANDARD", -1);
-        shouldReturnBadRequest(1, "STANDARD", 10000);
+        shouldReturnBadRequest(
+            new ServiceTaskFixture(1, "NON-TRIVIAL", 2),
+            expectSimpleValidationError("Cannot read request")
+        );
+        shouldReturnBadRequest(
+            new ServiceTaskFixture(-1, "STANDARD", 2),
+            expectDetailedValidationError("region", "must be greater than or equal to 1")
+        );
+        shouldReturnBadRequest(
+            new ServiceTaskFixture(10000, "STANDARD", 2),
+            expectDetailedValidationError("region", "must be less than or equal to 9999")
+        );
+        shouldReturnBadRequest(
+            new ServiceTaskFixture(1, "STANDARD", -1),
+            expectDetailedValidationError("atmId", "must be greater than or equal to 1")
+        );
+        shouldReturnBadRequest(
+            new ServiceTaskFixture(1, "STANDARD", 10000),
+            expectDetailedValidationError("atmId", "must be less than or equal to 9999")
+        );
     }
 
-    private void shouldReturnBadRequest(int region, String requestType, int atmId) {
+    private void shouldReturnBadRequest(ServiceTaskFixture serviceTask, ResponseSpecification responseSpecification) {
         // @formatter:off
         given()
             .contentType(JSON)
-            .body(requestBodyWithSingleTask(region, requestType, atmId))
+            .body(singletonList(serviceTask))
         .when()
             .post("/atms/calculateOrder")
         .then()
-            .statusCode(400);
+            .statusCode(400)
+            .spec(responseSpecification);
         // @formatter:on
-    }
-
-    private String requestBodyWithSingleTask(int region, String requestType, int atmId) {
-        return String.format("""
-            [
-                {
-                    "region": %d,
-                    "requestType": "%s",
-                    "atmId": %d
-                }
-            ]
-            """, region, requestType, atmId);
     }
 }

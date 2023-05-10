@@ -8,7 +8,6 @@ import static com.maracuya.app.atmservice.RequestType.FAILURE_RESTART;
 import static com.maracuya.app.atmservice.RequestType.PRIORITY;
 import static com.maracuya.app.atmservice.RequestType.SIGNAL_LOW;
 import static com.maracuya.app.atmservice.RequestType.STANDARD;
-import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 
@@ -18,7 +17,7 @@ class AtmOrderingServiceTest {
 
     @Test
     void regionWithLowerIdShouldTakePrecedence() {
-        List<ServiceTask> tasks = asList(
+        List<ServiceTask> tasks = List.of(
             new ServiceTask(3, STANDARD, 1),
             new ServiceTask(2, STANDARD, 1),
             new ServiceTask(1, STANDARD, 1)
@@ -33,7 +32,7 @@ class AtmOrderingServiceTest {
 
     @Test
     void tasksInTheSameRegionShouldBeProcessedAccordingToRequestTypePriority() {
-        List<ServiceTask> tasks = asList(
+        List<ServiceTask> tasks = List.of(
             new ServiceTask(1, PRIORITY, 2),
             new ServiceTask(1, FAILURE_RESTART, 1),
             new ServiceTask(1, STANDARD, 3),
@@ -49,7 +48,7 @@ class AtmOrderingServiceTest {
 
     @Test
     void eachAtmShouldBeProcessedAtMostOnceInGivenRegion() {
-        List<ServiceTask> tasks = asList(
+        List<ServiceTask> tasks = List.of(
             new ServiceTask(1, STANDARD, 1),
             new ServiceTask(1, FAILURE_RESTART, 1),
             new ServiceTask(1, SIGNAL_LOW, 1),
