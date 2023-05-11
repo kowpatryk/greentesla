@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "com.maracuya"
-version = "0.0.1-SNAPSHOT"
+
 java.sourceCompatibility = VERSION_17
 
 repositories {
@@ -28,4 +28,8 @@ dependencies {
 
 tasks.withType<Test> {
 	useJUnitPlatform()
+}
+
+tasks.bootJar {
+	archiveFileName.set("application.jar")
 }

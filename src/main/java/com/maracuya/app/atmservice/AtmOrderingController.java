@@ -19,7 +19,7 @@ public class AtmOrderingController {
     }
 
     @PostMapping("/atms/calculateOrder")
-    public List<AtmDetails> calculate(@RequestBody @Valid List<ServiceTask> serviceTasks) {
+    public AtmOrder calculate(@RequestBody @Valid List<ServiceTask> serviceTasks) {
         return orderingService.calculateOrder(serviceTasks);
     }
 }

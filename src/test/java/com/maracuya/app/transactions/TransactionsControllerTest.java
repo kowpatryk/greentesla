@@ -103,7 +103,7 @@ class TransactionsControllerTest extends BaseControllerTest {
     }
 
     private List<Transaction> tooManyTransactions() {
-        return IntStream.rangeClosed(0, 100001)
+        return IntStream.rangeClosed(0, 100000)
             .mapToObj(idx ->
                 new Transaction(
                     "31074318698137062235845814",

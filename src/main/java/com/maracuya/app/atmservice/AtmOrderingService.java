@@ -13,11 +13,11 @@ public class AtmOrderingService {
     private static final Comparator<ServiceTask> SERVICE_TASK_COMPARATOR =
         comparing(ServiceTask::region).thenComparing(task -> task.requestType().priorityOrder);
 
-    public List<AtmDetails> calculateOrder(List<ServiceTask> serviceTasks) {
-        return serviceTasks.stream()
+    public AtmOrder calculateOrder(List<ServiceTask> serviceTasks) {
+        return new AtmOrder(serviceTasks.stream()
             .sorted(SERVICE_TASK_COMPARATOR)
             .map(task -> new AtmDetails(task.region(), task.atmId()))
             .distinct()
-            .toList();
+            .toList());
     }
 }

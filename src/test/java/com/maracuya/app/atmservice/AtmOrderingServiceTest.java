@@ -23,7 +23,7 @@ class AtmOrderingServiceTest {
             new ServiceTask(1, STANDARD, 1)
         );
 
-        List<AtmDetails> detailsList = atmOrderingService.calculateOrder(tasks);
+        List<AtmDetails> detailsList = atmOrderingService.calculateOrder(tasks).atms();
 
         assertThat(detailsList)
             .extracting(AtmDetails::region)
@@ -39,7 +39,7 @@ class AtmOrderingServiceTest {
             new ServiceTask(1, SIGNAL_LOW, 4)
         );
 
-        List<AtmDetails> detailsList = atmOrderingService.calculateOrder(tasks);
+        List<AtmDetails> detailsList = atmOrderingService.calculateOrder(tasks).atms();
 
         assertThat(detailsList)
             .extracting(AtmDetails::atmId)
@@ -55,7 +55,7 @@ class AtmOrderingServiceTest {
             new ServiceTask(2, STANDARD, 1)
         );
 
-        List<AtmDetails> detailsList = atmOrderingService.calculateOrder(tasks);
+        List<AtmDetails> detailsList = atmOrderingService.calculateOrder(tasks).atms();
 
         assertThat(detailsList)
             .extracting(AtmDetails::region, AtmDetails::atmId)
