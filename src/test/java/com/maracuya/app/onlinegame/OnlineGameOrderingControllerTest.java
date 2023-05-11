@@ -5,8 +5,6 @@ import io.restassured.builder.ResponseSpecBuilder;
 import io.restassured.specification.ResponseSpecification;
 import org.junit.jupiter.api.Test;
 
-import java.util.stream.IntStream;
-
 import static com.maracuya.app.common.Resources.loadResourceAsString;
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
@@ -19,16 +17,12 @@ class OnlineGameOrderingControllerTest extends BaseControllerTest {
         // @formatter:off
         given()
             .contentType(JSON)
-            .body(new Players(
-                10,
-                IntStream.range(0, 20000).mapToObj(idx -> new Clan(9, 20)).toList()
-            ))
-//            .body(loadResourceAsString("onlinegame/example_request.json"))
+            .body(loadResourceAsString("onlinegame/example_request.json"))
         .when()
             .post("/onlinegame/calculate")
         .then()
-            .statusCode(200);
-//            .spec(expectedGameOrder());
+            .statusCode(200)
+            .spec(expectedGameOrder());
         // @formatter:on
     }
 
