@@ -3,6 +3,8 @@ package com.maracuya.app.transactions;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 
+import java.math.BigDecimal;
+
 @ValidTransaction
 public record Transaction(
 
@@ -13,6 +15,6 @@ public record Transaction(
     String creditAccount,
 
     @Positive
-    double amount
+    BigDecimal amount
 ) {
 }

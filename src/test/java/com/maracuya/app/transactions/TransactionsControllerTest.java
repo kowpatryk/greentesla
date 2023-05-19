@@ -5,6 +5,7 @@ import io.restassured.builder.ResponseSpecBuilder;
 import io.restassured.specification.ResponseSpecification;
 import org.junit.jupiter.api.Test;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.IntStream;
 
@@ -56,43 +57,33 @@ class TransactionsControllerTest extends BaseControllerTest {
     @Test
     void shouldReturnBadRequestForInvalidPayload() {
         shouldReturnBadRequest(
-            singletonList(new Transaction(
-                "123456789",
-                "31074318698137062235845814",
-                100
-            )),
+            singleTransaction("123456789", "31074318698137062235845814", 100),
             "debitAccount",
             "size must be exactly 26"
         );
 
         shouldReturnBadRequest(
-            singletonList(new Transaction(
-                "31074318698137062235845814",
-                "123456789",
-                100
-            )),
+            singleTransaction("31074318698137062235845814", "123456789", 100),
             "creditAccount",
             "size must be exactly 26"
         );
 
         shouldReturnBadRequest(
-            singletonList(new Transaction(
-                "31074318698137062235845814",
-                "11074318698137062235845814",
-                -10.0
-            )),
+            singleTransaction("31074318698137062235845814", "11074318698137062235845814", -10.0),
             "amount",
             "must be greater than 0"
         );
 
         shouldReturnBadRequest(
-            singletonList(new Transaction(
-                "31074318698137062235845814",
-                "31074318698137062235845814",
-                10.0
-            )),
+            singleTransaction("31074318698137062235845814", "31074318698137062235845814", 10.0),
             "",
-            "Credit and debit accounts must be different"
+            "Credit and debit accounts must be different."
+        );
+
+        shouldReturnBadRequest(
+            singleTransaction("31074318698137062235845814", "06105023389842834748547303", 10.923),
+            "",
+            "Amount must have at most 2 decimal places."
         );
 
         shouldReturnBadRequest(
@@ -102,13 +93,18 @@ class TransactionsControllerTest extends BaseControllerTest {
         );
     }
 
+    private List<Transaction> singleTransaction(String debitAccount, String creditAccount, double amount) {
+        Transaction transaction = new Transaction(debitAccount, creditAccount, BigDecimal.valueOf(amount));
+        return singletonList(transaction);
+    }
+
     private List<Transaction> tooManyTransactions() {
         return IntStream.rangeClosed(0, 100000)
             .mapToObj(idx ->
                 new Transaction(
                     "31074318698137062235845814",
                     "11234418698137062235845999",
-                    1.0
+                    BigDecimal.valueOf(1.0)
                 ))
             .toList();
     }
